@@ -1,7 +1,16 @@
-streamlit
-pandas
-numpy
-rdkit
-scikit-learn
-joblib
-matplotlib
+# Requirements for molecular-features-analysis
+# Note: RDKit is best installed via conda for full functionality:
+#   conda install -c conda-forge rdkit
+# If using pip, rdkit-pypi may work in some environments (included below).
+
+streamlit>=1.20.0
+pandas>=1.4.0
+numpy>=1.21.0
+rdkit-pypi>=2023.9.1
+scikit-learn>=1.0
+joblib>=1.2.0
+matplotlib>=3.5.0
+pillow>=9.0.0
+
+# Optional (useful for nicer plots & visuals):
+# seaborn>=0.12.0
