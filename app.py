@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 from rdkit import Chem
-from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors, Draw
+from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 from sklearn.preprocessing import StandardScaler
 import joblib
 
@@ -19,15 +19,16 @@ def compute_molecular_features(smiles):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
+    
     fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=1024)
     fp_array = np.array(fingerprint)
+    
     descriptors = [
         Descriptors.MolWt(mol),
         Descriptors.NumRotatableBonds(mol),
         Descriptors.NumHAcceptors(mol),
         Descriptors.NumHDonors(mol),
         Descriptors.TPSA(mol),
-        Descriptors.FractionCsp3(mol),
         Descriptors.NumAromaticRings(mol),
         Descriptors.NumHeteroatoms(mol),
         Descriptors.RingCount(mol),
@@ -38,6 +39,7 @@ def compute_molecular_features(smiles):
         Descriptors.MolLogP(mol),
         Descriptors.HeavyAtomCount(mol)
     ]
+    
     return np.concatenate([fp_array, descriptors]), mol
 
 st.title("متنبئ جهد الأكسدة والاختزال")
@@ -59,8 +61,9 @@ smiles_input = st.text_input(
 
 if st.button("توقع الجهد", type="primary"):
     if smiles_input:
-        features, mol = compute_molecular_features(smiles_input)
-        if features is not None:
+        result = compute_molecular_features(smiles_input)
+        if result is not None:
+            features, mol = result
             features_scaled = scaler.transform([features])
             prediction = model.predict(features_scaled)[0]
             
@@ -71,7 +74,12 @@ if st.button("توقع الجهد", type="primary"):
                 st.metric("نوع الجزيء", 
                          "موجب (أنود)" if prediction > -0.5 else "سالب (كاثود)")
             
-            st.image(Draw.MolToImage(mol, size=(300, 200)), caption="تركيب الجزيء")
+            try:
+                from rdkit.Chem import Draw
+                img = Draw.MolToImage(mol, size=(300, 200))
+                st.image(img, caption="تركيب الجزيء")
+            except Exception:
+                st.info("صيغة SMILES صالحة")
         else:
             st.error("صيغة SMILES غير صالحة")
     else:
