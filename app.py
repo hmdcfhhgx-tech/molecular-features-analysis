@@ -29,6 +29,7 @@ def compute_molecular_features(smiles):
         Descriptors.NumHAcceptors(mol),
         Descriptors.NumHDonors(mol),
         Descriptors.TPSA(mol),
+        Descriptors.FractionCSP3(mol),
         Descriptors.NumAromaticRings(mol),
         Descriptors.NumHeteroatoms(mol),
         Descriptors.RingCount(mol),
